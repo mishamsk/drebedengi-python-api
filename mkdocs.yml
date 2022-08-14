@@ -1,0 +1,82 @@
+site_name: Drebedengi Python API
+site_url: https://mishamsk.github.io/drebedengi-python-api
+repo_url: https://github.com/mishamsk/drebedengi-python-api
+repo_name: mishamsk/drebedengi-python-api
+#strict: true
+watch:
+  - .
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage: usage.md
+  - API Reference: reference/
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+theme:
+  name: material
+  language: en
+  #logo: assets/logo.png
+  palette:
+    scheme: preference
+    primary: indigo
+    accent: indigo
+  features:
+    - navigation.indexes
+    - navigation.instant
+    - navigation.tabs.sticky
+markdown_extensions:
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tabbed
+  - attr_list
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      linenums: false
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.details
+  - admonition
+  - toc:
+      baselevel: 2
+      permalink: true
+      slugify: !!python/name:pymdownx.slugs.uslugify
+  - meta
+plugins:
+  - include-markdown
+  - search:
+      lang: en
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - exclude:
+      glob:
+        - gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            docstring_options:
+              ignore_init_summary: yes
+            merge_init_into_class: yes
+            show_source: false
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mishamsk/drebedengi-python-api
+      name: Github
+    - icon: material/email
+      link: "mailto:mishamsk@gmail.com"
+# TODO: add GA
+#google_analytics:
+#- UA-xxx
+#- auto

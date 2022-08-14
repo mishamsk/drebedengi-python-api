@@ -1,0 +1,24 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: check-json
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+        exclude: ".*jinja2$"
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: .bumpversion.cfg
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+        args: ["--filter-files"]
+  - repo: https://github.com/ambv/black
+    rev: 22.6.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
