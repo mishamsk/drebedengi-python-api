@@ -23,6 +23,30 @@ def _xml_timestamp_to_datetime(xml_str: str | datetime) -> datetime:
     return datetime.fromtimestamp(float(xml_str))
 
 
+class ReportPeriod(IntEnum):
+    CUSTOM_PERIOD = 0
+    THIS_MONTH = 1
+    TODAY = 7
+    LAST_MONTH = 2
+    THIS_QUART = 3
+    THIS_YEAR = 4
+    LAST_YEAR = 5
+    ALL_TIME = 6
+    LAST_20_RECORD = 8
+
+
+class ReportGrouping(IntEnum):
+    NONE = 1
+    BY_INCOME_SOURCE = 2
+    BY_EXPENSE_CATEGORY = 3
+
+
+class ReportFilterType(IntEnum):
+    NONE = 0
+    SELECTED_ONLY = 1
+    EXCEPT_SELECTED = 2
+
+
 class TransactionType(IntEnum):
     INCOME = 2
     EXPENSE = 3

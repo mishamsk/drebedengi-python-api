@@ -1,12 +1,12 @@
 import logging
 from datetime import datetime
-from enum import IntEnum
 
 import zeep
 from lxml import etree
 from zeep.client import Client
+from requests.models import Response
 
-from .model import Transaction, TransactionType
+from .model import Transaction, TransactionType, ReportFilterType, ReportGrouping, ReportPeriod
 from .utils import generate_xml_array, xmlmap_to_model
 
 from typing import Any, Dict, List
@@ -16,28 +16,35 @@ logger = logging.getLogger(__name__)
 DREBEDENGI_DEFAULT_SOAP_URL = "https://www.drebedengi.ru/soap/dd.wsdl"
 
 
-class ReportPeriod(IntEnum):
-    CUSTOM_PERIOD = 0
-    THIS_MONTH = 1
-    TODAY = 7
-    LAST_MONTH = 2
-    THIS_QUART = 3
-    THIS_YEAR = 4
-    LAST_YEAR = 5
-    ALL_TIME = 6
-    LAST_20_RECORD = 8
+class DrebedengiAPIError(Exception):
+    """Drebedengi API error."""
 
+    def __init__(
+        self, message: str, status_code: int, response_text: str, fault_code: str | None = None
+    ) -> None:
+        """Initialize."""
+        self.status_code = status_code
+        self.response_text = response_text
+        self.fault_code = fault_code
+        super().__init__(message, fault_code)
 
-class ReportGrouping(IntEnum):
-    NONE = 1
-    BY_INCOME_SOURCE = 2
-    BY_EXPENSE_CATEGORY = 3
+    @classmethod
+    def check_and_raise(cls, response: Response) -> None:  # type: ignore
+        """
+        Check if response is an API error and immediatelly raise it.
+        """
+        if not response.ok:
+            raise cls("Network error", response.status_code, response.text)
 
-
-class ReportFilterType(IntEnum):
-    NONE = 0
-    SELECTED_ONLY = 1
-    EXCEPT_SELECTED = 2
+        root = etree.fromstring(response.content)
+        fault = root.find(".//{http://schemas.xmlsoap.org/soap/envelope/}Fault")
+        if fault is not None:
+            raise cls(
+                fault.findtext(".//faultstring"),
+                response.status_code,
+                response.text,
+                fault.findtext(".//faultcode"),
+            )
 
 
 class DrebedengiAPI:
@@ -166,7 +173,60 @@ class DrebedengiAPI:
                 idList=id_list_xml,
                 params=params,
             )
+
+            DrebedengiAPIError.check_and_raise(result)
+
         root = etree.fromstring(result.content)
         items: List[etree.Element] = root.xpath("//getRecordListReturn/item/value")
 
         return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
+
+    def get_changes(self, *, revision: int) -> List[Transaction]:
+        """
+        Implements getChangeList API
+
+        Original wsdl description:
+            Get all changes (array of arrays) from server relative to given revision: [revision] => the revision of the change, [action_id] => the action of the change '1' - add, '2' - update, '3' - delete'; [object_type_id] => type of the object changed '1' - any record (transction), '2' - income source, '3' - waste category, '4' - place, '5' - currency, '6' - budget_tags, '7' - budget_accum, '8' - budget_accum_order; [object_id] => ID of the object for subsequent calls getRecordList, getCategoryList etc; [date] => the date of the change; Parameter [revision] => int8 number, usually saved on the client from last successfull sync.
+        """
+
+        logger.debug(f"Getting changes with the following params: {revision=}")
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getChangeList(
+                self.api_key, self.login, self.password, revision=revision
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.xpath("//getChangeListReturn/item/value")
+
+        raise NotImplementedError
+        return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
+
+    def get_current_revision(self) -> int:
+        """
+        Implements getCurrentRevision API
+
+        Original wsdl description:
+            Get current server revision number.
+        """
+
+        logger.debug("Getting current server revision")
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getCurrentRevision(
+                self.api_key,
+                self.login,
+                self.password,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+
+        return int(root.findtext(".//getCurrentRevisionReturn"))
