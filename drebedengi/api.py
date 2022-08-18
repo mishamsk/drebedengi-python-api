@@ -3,10 +3,10 @@ from datetime import datetime
 
 import zeep
 from lxml import etree
-from zeep.client import Client
 from requests.models import Response
+from zeep.client import Client
 
-from .model import Transaction, TransactionType, ReportFilterType, ReportGrouping, ReportPeriod
+from .model import ReportFilterType, ReportGrouping, ReportPeriod, Transaction, TransactionType
 from .utils import generate_xml_array, xmlmap_to_model
 
 from typing import Any, Dict, List
@@ -29,7 +29,7 @@ class DrebedengiAPIError(Exception):
         super().__init__(message, fault_code)
 
     @classmethod
-    def check_and_raise(cls, response: Response) -> None:  # type: ignore
+    def check_and_raise(cls, response: Response) -> None:
         """
         Check if response is an API error and immediatelly raise it.
         """

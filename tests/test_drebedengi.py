@@ -3,12 +3,12 @@
 
 import os
 from pathlib import Path
+
 from drebedengi import DrebedengiAPI
 from drebedengi.model import Transaction
 
-from attrs import evolve
-
 import pytest
+from attrs import evolve
 
 
 @pytest.fixture(scope="module")
@@ -72,4 +72,4 @@ def test_get_transaction_by_id(test_api: DrebedengiAPI, sample_transaction: Tran
 
 def test_get_changes(test_api: DrebedengiAPI, current_revision: int) -> None:
     """Test get_changes"""
-    changes = test_api.get_changes(revision=current_revision - 1)
+    # changes = test_api.get_changes(revision=current_revision - 1)
