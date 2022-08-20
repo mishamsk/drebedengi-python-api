@@ -39,4 +39,4 @@ jobs:
           poetry install
 
       - name: test with tox
-        run: tox
+        run: poetry run tox
