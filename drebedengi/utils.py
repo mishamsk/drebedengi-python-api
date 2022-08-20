@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 from attrs import fields_dict, has
 from lxml import etree
 from zeep import xsd
 from zeep.helpers import guess_xsd_type
 
-from typing import Any, List, Type, TypeVar
+from typing import Any, List, Type, TypeVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .model import Transaction
 
 T = TypeVar("T")
 
@@ -39,7 +44,9 @@ def xmlmap_to_model(xmlmap: etree.Element, model_type: Type[T], *, strict: bool 
         if value:
             vals[name] = value[0]
         elif strict and not (field.type and isinstance(None, field.type)):
-            raise ValueError(f"Key: {name} was not found in the element {etree.dump(xmlmap)}")
+            raise ValueError(
+                f"Key <{name}> was not found in the element {etree.tostring(xmlmap, pretty_print=True)}"
+            )
 
     try:
         ret = model_type(**vals)
@@ -57,3 +64,14 @@ def generate_xml_array(values: List[Any]) -> xsd.ComplexType:
     )
 
     return Array(item=[xsd.AnyObject(guess_xsd_type(value), value) for value in values])  # type: ignore
+
+
+def check_same_transfer_transactions(tr1: Transaction, tr2: Transaction) -> bool:
+    return (
+        tr1.amount == -tr2.amount
+        and tr1.budget_family_id == tr2.budget_family_id
+        and tr1.comment == tr2.comment
+        and tr1.currency_id == tr2.currency_id
+        and tr1.operation_date == tr2.operation_date
+        and tr1.user_nuid == tr2.user_nuid
+    )

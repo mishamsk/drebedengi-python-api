@@ -6,7 +6,14 @@ from lxml import etree
 from requests.models import Response
 from zeep.client import Client
 
-from .model import ReportFilterType, ReportGrouping, ReportPeriod, Transaction, TransactionType
+from .model import (
+    ReportFilterType,
+    ReportGrouping,
+    ReportPeriod,
+    Transaction,
+    TransactionType,
+    ChangeRecord,
+)
 from .utils import generate_xml_array, xmlmap_to_model
 
 from typing import Any, Dict, List
@@ -181,7 +188,7 @@ class DrebedengiAPI:
 
         return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
 
-    def get_changes(self, *, revision: int) -> List[Transaction]:
+    def get_changes(self, *, revision: int) -> List[ChangeRecord]:
         """
         Implements getChangeList API
 
@@ -201,10 +208,9 @@ class DrebedengiAPI:
             DrebedengiAPIError.check_and_raise(result)
 
         root = etree.fromstring(result.content)
-        items: List[etree.Element] = root.xpath("//getChangeListReturn/item/value")
+        items: List[etree.Element] = root.xpath("//getChangeListReturn/item")
 
-        raise NotImplementedError
-        return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
+        return [xmlmap_to_model(item, ChangeRecord, strict=self.strict) for item in items]
 
     def get_current_revision(self) -> int:
         """

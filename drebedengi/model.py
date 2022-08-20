@@ -68,18 +68,59 @@ class Transaction:
     budget_object_id: int = field(converter=int)
     user_nuid: int = field(converter=int)
     budget_family_id: int = field(converter=int)
-    # FIX THIS: change to a relevant name
-    is_duty: bool = field(converter=to_bool, metadata={"xml": {"name": "is_duty"}})
+    is_loan_transfer: bool = field(converter=to_bool, metadata={"xml": {"name": "is_duty"}})
     operation_date: datetime = field(converter=_xml_dttm_str_to_datetime)
-    comment: str = field(converter=str)
     currency_id: int = field(converter=int)
     operation_type: TransactionType = field(converter=_transaction_type_from_str)
     account_id: int = field(converter=int, metadata={"xml": {"name": "place_id"}})
     amount: int = field(converter=int, metadata={"xml": {"name": "sum"}})
     """ Transaction amount in the original currency """
+    comment: str | None = field(converter=str, default=None)
     oper_utc_timestamp: datetime | None = field(
         converter=optional(_xml_timestamp_to_datetime),
         metadata={"xml": {"name": "oper_timestamp"}},
         default=None,
     )
     group_id: int | None = field(converter=optional(int), default=None)
+
+
+class ChangeObjectType(IntEnum):
+    TRANSACTION = 1
+    INCOME_SOURCE = 2
+    EXPENSE_CATEGORY = 3
+    ACCOUNT = 4
+    CURRENCY = 5
+    BUDGET_TAGS = 6  # fIXME: proper name
+    BUDGET_ACCUM = 7  # fIXME: proper name
+    BUDGET_ACCUM_ORDER = 8  # fIXME: proper name
+
+
+def _change_type_from_str(Change_type_str: str) -> ChangeObjectType:
+    """Converts Change type string to ChangeType enum."""
+    return ChangeObjectType(int(Change_type_str))
+
+
+class ActionType(IntEnum):
+    CREATE = 1
+    UPDATE = 2
+    DELETE = 3
+
+
+def _action_type_from_str(action_type_str: str) -> ActionType:
+    """Converts action type string to ActionType enum."""
+    return ActionType(int(action_type_str))
+
+
+@define
+class ChangeRecord:
+    """Drebedengi change record model."""
+
+    revision_id: int = field(converter=int, metadata={"xml": {"name": "revision"}})
+    action_type: ActionType = field(
+        converter=_action_type_from_str, metadata={"xml": {"name": "action_id"}}
+    )
+    change_object_type: ChangeObjectType = field(
+        converter=_change_type_from_str, metadata={"xml": {"name": "object_type_id"}}
+    )
+    object_id: int = field(converter=int)
+    date: datetime = field(converter=_xml_dttm_str_to_datetime)
