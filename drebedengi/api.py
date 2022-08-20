@@ -7,12 +7,12 @@ from requests.models import Response
 from zeep.client import Client
 
 from .model import (
+    ChangeRecord,
     ReportFilterType,
     ReportGrouping,
     ReportPeriod,
     Transaction,
     TransactionType,
-    ChangeRecord,
 )
 from .utils import generate_xml_array, xmlmap_to_model
 

@@ -25,6 +25,7 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
+	rm -fr site/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
 	find . -name '.mypy_cache' -exec rm -fr {} +
@@ -40,6 +41,7 @@ clean-pyc: ## remove Python file artifacts
 .PHONY: clean-test
 clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
+	rm -f coverage.xml
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 	rm -fr testtemp/

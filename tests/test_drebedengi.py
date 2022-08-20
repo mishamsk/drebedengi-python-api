@@ -3,13 +3,14 @@
 
 import os
 from pathlib import Path
-from typing import List, Tuple
 
 from drebedengi import DrebedengiAPI
 from drebedengi.model import ChangeRecord, Transaction, TransactionType
 
 import pytest
 from attrs import evolve
+
+from typing import List, Tuple
 
 
 @pytest.fixture(scope="module")
