@@ -5,7 +5,7 @@ from lxml import etree
 from zeep import xsd
 from zeep.helpers import guess_xsd_type
 
-from typing import Any, List, Type, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Type, TypeVar
 
 if TYPE_CHECKING:
     from .model import Transaction
