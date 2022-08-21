@@ -1,3 +1,5 @@
+""" Supporting utilities for working with XML & SOAP """
+
 from __future__ import annotations
 
 from attrs import fields_dict, has
@@ -57,7 +59,14 @@ def xmlmap_to_model(xmlmap: etree.Element, model_type: Type[T], *, strict: bool 
 
 
 def generate_xml_array(values: List[Any]) -> xsd.ComplexType:
-    """Generates an SOAP Array from a list of values."""
+    """Generates a SOAP Array from a list of values.
+
+    Args:
+        values (List[Any]): a list of values to be converted to an XML SOAP Encoded Array.
+
+    Returns:
+        xsd.ComplexType: zeep XML ComplexType representing an XML SOAP Encoded Array.
+    """
     Array = xsd.ComplexType(
         xsd.Sequence([xsd.Element("item", xsd.AnyType(), min_occurs=1, max_occurs="unbounded")]),  # type: ignore
         qname=etree.QName("{http://schemas.xmlsoap.org/soap/encoding/}Array"),

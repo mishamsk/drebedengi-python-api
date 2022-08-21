@@ -6,7 +6,7 @@ To install Drebedengi Python API, run this command in your
 terminal:
 
 ``` console
-$ pip install drebedengi
+$ pip install drebedengi-python-api
 ```
 
 This is the preferred method to install Drebedengi Python API, as it will always install the most recent stable release.
