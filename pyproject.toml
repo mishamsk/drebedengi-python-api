@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "drebedengi-python-api"
-version = "0.1.0a"
+version = "0.1.0"
 homepage = "https://github.com/mishamsk/drebedengi-python-api"
 description = "Python wrapper for Drebedengi SOAP API."
 authors = ["Mike Perlov <mishamsk@gmail.com>"]

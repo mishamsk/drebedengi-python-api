@@ -17,8 +17,10 @@ A rather thin python wrapper for Drebedengi SOAP API.
 ## Features
 
 * Almost full coverage of "get" methods with better English naming for params & types (see [drebedengi.api][])
+
 !!! important
     Retrieving aggregated reports via `get_transactions` is not currently supported, despite full list of API parameters
+
 * Typed data model (see [drebedengi.model][])
 
 ## Credits
