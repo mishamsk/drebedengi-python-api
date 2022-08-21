@@ -7,10 +7,15 @@ from requests.models import Response
 from zeep.client import Client
 
 from .model import (
+    Account,
     ChangeRecord,
+    Currency,
+    ExpenseCategory,
+    IncomeSource,
     ReportFilterType,
     ReportGrouping,
     ReportPeriod,
+    Tag,
     Transaction,
     TransactionType,
 )
@@ -24,7 +29,7 @@ DREBEDENGI_DEFAULT_SOAP_URL = "https://www.drebedengi.ru/soap/dd.wsdl"
 
 
 class DrebedengiAPIError(Exception):
-    """Drebedengi API error."""
+    """Drebedengi API error class."""
 
     def __init__(
         self, message: str, status_code: int, response_text: str, fault_code: str | None = None
@@ -55,7 +60,7 @@ class DrebedengiAPIError(Exception):
 
 
 class DrebedengiAPI:
-    """Drebedengi API client."""
+    """Drebedengi API Wrapper class."""
 
     def __init__(
         self,
@@ -170,6 +175,9 @@ class DrebedengiAPI:
         else:
             id_list_xml = zeep.xsd.SkipValue  # type: ignore
 
+        if aggregated:
+            raise NotImplementedError("aggregated is not implemented yet")
+
         client = self.client
 
         with client.settings(raw_response=True, strict=False):
@@ -184,7 +192,7 @@ class DrebedengiAPI:
             DrebedengiAPIError.check_and_raise(result)
 
         root = etree.fromstring(result.content)
-        items: List[etree.Element] = root.xpath("//getRecordListReturn/item/value")
+        items: List[etree.Element] = root.findall(".//getRecordListReturn/item/value")
 
         return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
 
@@ -208,9 +216,189 @@ class DrebedengiAPI:
             DrebedengiAPIError.check_and_raise(result)
 
         root = etree.fromstring(result.content)
-        items: List[etree.Element] = root.xpath("//getChangeListReturn/item")
+        items: List[etree.Element] = root.findall(".//getChangeListReturn/item")
 
         return [xmlmap_to_model(item, ChangeRecord, strict=self.strict) for item in items]
+
+    def get_expense_categories(
+        self,
+        *,
+        id_list: List[int] | None = None,
+    ) -> List[ExpenseCategory]:
+        """
+        Implements getCategoryList API
+
+        Original wsdl description:
+            Retrievs waste category list (array of arrays): [id] => Internal category ID; [parent_id] => For tree structure; [budget_family_id] => User family ID (for multiuser mode); [type] => Type of object, 3 - waste category; [name] => Category name given by user; [is_hidden] => is category hidden in user interface; [sort] => User sort of category tree; If parameter [idList] is given, it will be treat as ID list of objects to retrieve# this is used for synchronization;
+        """
+
+        logger.debug(f"Getting categories with the following params: {id_list=}")
+
+        if id_list is not None:
+            id_list_xml = generate_xml_array(id_list)
+        else:
+            id_list_xml = zeep.xsd.SkipValue  # type: ignore
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getCategoryList(
+                self.api_key,
+                self.login,
+                self.password,
+                idList=id_list_xml,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.findall(".//getCategoryListReturn/item")
+
+        return [xmlmap_to_model(item, ExpenseCategory, strict=self.strict) for item in items]
+
+    def get_income_sources(
+        self,
+        *,
+        id_list: List[int] | None = None,
+    ) -> List[IncomeSource]:
+        """
+        Implements getSourceList API
+
+        Original wsdl description:
+            Retrievs income source list (array of arrays): [id] => Internal source ID; [parent_id] => For tree structure; [budget_family_id] => User family ID (for multiuser mode); [type] => Type of object, 2 - income source; [name] => Source name given by user; [is_hidden] => is income hidden in user interface; [sort] => User sort of source tree; If parameter [idList] is given, it will be treat as ID list of objects to retrieve# this is used for synchronization;
+        """
+
+        logger.debug(f"Getting income sources with the following params: {id_list=}")
+
+        if id_list is not None:
+            id_list_xml = generate_xml_array(id_list)
+        else:
+            id_list_xml = zeep.xsd.SkipValue  # type: ignore
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getSourceList(
+                self.api_key,
+                self.login,
+                self.password,
+                idList=id_list_xml,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.findall(".//getSourceListReturn/item")
+
+        return [xmlmap_to_model(item, IncomeSource, strict=self.strict) for item in items]
+
+    def get_tags(
+        self,
+        *,
+        id_list: List[int] | None = None,
+    ) -> List[Tag]:
+        """
+        Implements getTagList API
+
+        Original wsdl description:
+            Retrievs tag list (array of arrays): [id] => Internal tag ID; [family_id] => User family ID (for multiuser mode); [name] => Tag name given by user; [is_hidden] => is tag hidden in user interface; [is_family] => is tag visible for all family user, or user only; [sort] => User sort of tag list; [parent_id] => For tree view; If parameter [idList] is given, it will be treat as ID list of objects to retrieve# this is used for synchronization;
+        """
+
+        logger.debug(f"Getting tags with the following params: {id_list=}")
+
+        if id_list is not None:
+            id_list_xml = generate_xml_array(id_list)
+        else:
+            id_list_xml = zeep.xsd.SkipValue  # type: ignore
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getTagList(
+                self.api_key,
+                self.login,
+                self.password,
+                idList=id_list_xml,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.findall(".//getTagListReturn/item")
+
+        return [xmlmap_to_model(item, Tag, strict=self.strict) for item in items]
+
+    def get_currencies(
+        self,
+        *,
+        id_list: List[int] | None = None,
+    ) -> List[Currency]:
+        """
+        Implements getCurrencyList API
+
+        Original wsdl description:
+            Retrievs currency list (array of arrays) with codes and courses: [id] => Internal currency ID; [name] => Currency name, given by user; [course] => current course from sbrf(dot)ru; [code] => International currency code (for course autoupdating); [family_id] => User family ID (for multiuser mode); [is_default] => is default currency# There should be only one default currency; [is_autoupdate] => autoupdate course once per day, from sbrf(dot)ru; [is_hidden] => is currency hidden in user interface; If parameter [idList] is given, it will be treat as ID list of objects to retrieve# this is used for synchronization;
+        """
+
+        logger.debug(f"Getting currencies with the following params: {id_list=}")
+
+        if id_list is not None:
+            id_list_xml = generate_xml_array(id_list)
+        else:
+            id_list_xml = zeep.xsd.SkipValue  # type: ignore
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getCurrencyList(
+                self.api_key,
+                self.login,
+                self.password,
+                idList=id_list_xml,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.findall(".//getCurrencyListReturn/item")
+
+        return [xmlmap_to_model(item, Currency, strict=self.strict) for item in items]
+
+    def get_accounts(
+        self,
+        *,
+        id_list: List[int] | None = None,
+    ) -> List[Account]:
+        """
+        Implements getPlaceList API
+
+        Original wsdl description:
+            Retrievs place list (array of arrays): [id] => Internal place ID; [budget_family_id] => User family ID (for multiuser mode); [type] => Type of object, 4 - places; [name] => Place name given by user; [is_hidden] => is place hidden in user interface; [is_autohide] => debts will auto hide on null balance; [is_for_duty] => Internal place for duty logic, Auto created while user adds "Waste or income duty"; [sort] => User sort of place list; [purse_of_nuid] => Not empty if place is purse of user# The value is internal user ID; [icon_id] => Place icon ID from http://www(dot)drebedengi(dot)ru/img/pl[icon_id](dot)gif; If parameter [idList] is given, it will be treat as ID list of objects to retrieve# this is used for synchronization; There is may be empty response, if user access level is limited;
+        """
+
+        logger.debug(f"Getting accounts with the following params: {id_list=}")
+
+        if id_list is not None:
+            id_list_xml = generate_xml_array(id_list)
+        else:
+            id_list_xml = zeep.xsd.SkipValue  # type: ignore
+
+        client = self.client
+
+        with client.settings(raw_response=True, strict=False):
+            result = client.service.getPlaceList(
+                self.api_key,
+                self.login,
+                self.password,
+                idList=id_list_xml,
+            )
+
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        items: List[etree.Element] = root.findall(".//getPlaceListReturn/item")
+
+        return [xmlmap_to_model(item, Account, strict=self.strict) for item in items]
 
     def get_current_revision(self) -> int:
         """
