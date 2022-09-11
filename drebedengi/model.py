@@ -106,7 +106,7 @@ class Transaction:
 
     Attributes:
         id (int): transaction id
-        budget_object_id: (int) For expenses - expense category; for incomes - income source; for others TBC.
+        budget_object_id: (int) For expenses - expense category; for incomes - income source; for transfers - source account_id, for exchanges - equal to account_id.
         user_nuid: (int) User id.
         budget_family_id: (int) Family id for multi-user mode.
         is_loan_transfer: (bool) = Makrs trabsfer transactions that went to a "loan" account.
@@ -116,7 +116,7 @@ class Transaction:
         account_id: (int) Account id.
         amount: (int) Transaction amount in the original currency multiplied by 100
         comment: (str | None) Transaction comment. May be empty
-        oper_utc_timestamp (datetime): Operation date in UTC.
+        oper_utc_timestamp (datetime): System timestamp, no official documentation.
         group_id (int): Group id if this transaction is part of a group.
     """
 
