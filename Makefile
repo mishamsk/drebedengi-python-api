@@ -74,6 +74,7 @@ pre-commit:
 .PHONY: update-dev-deps
 update-dev-deps:
 	poetry add -G dev tox@latest
+	poetry add -G dev tox-gh-actions@latest
 	poetry add -G dev twine@latest
 	poetry add -G dev black@latest
 	poetry add -G dev flake8@latest
