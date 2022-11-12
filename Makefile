@@ -84,3 +84,16 @@ update-dev-deps:
 	poetry add -G test pytest@latest
 	poetry add -G test pytest-cov@latest
 	poetry add -G mypy mypy@latest
+
+.PHONY: update-docs-deps
+update-docs-deps:
+	poetry add -G docs mkdocs@latest
+	poetry add -G docs mkdocs-include-markdown-plugin@latest
+	poetry add -G docs mkdocs-material-extensions@latest
+	poetry add -G docs mkdocs-material@latest
+	poetry add -G docs mkdocs-section-index@latest
+	poetry add -G docs mkdocs-literate-nav@latest
+	poetry add -G docs mkdocs-gen-files@latest
+	poetry add -G docs mkdocs-exclude@latest
+	poetry add -G docs mkdocs-autorefs@latest
+	poetry add -G docs -e python mkdocstrings@latest
