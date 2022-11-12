@@ -70,3 +70,16 @@ coverage:
 .PHONY: pre-commit
 pre-commit:
 	pre-commit run --all-files
+
+.PHONY: update-dev-deps
+update-dev-deps:
+	poetry add -G dev tox@latest
+	poetry add -G dev twine@latest
+	poetry add -G dev black@latest
+	poetry add -G dev flake8@latest
+	poetry add -G dev isort@latest
+	poetry add -G dev bump2version@latest
+	poetry add -G dev pre-commit@latest
+	poetry add -G test pytest@latest
+	poetry add -G test pytest-cov@latest
+	poetry add -G mypy mypy@latest
