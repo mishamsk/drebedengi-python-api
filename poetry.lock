@@ -473,7 +473,7 @@ mkdocs = "*"
 
 [[package]]
 name = "mkdocs-gen-files"
-version = "0.3.5"
+version = "0.4.0"
 description = "MkDocs plugin to programmatically generate documentation pages during the build"
 category = "dev"
 optional = false
@@ -496,7 +496,7 @@ test = ["mkdocs (==1.4.0)", "pytest (==7.1.3)", "pytest-cov (==3.0.0)"]
 
 [[package]]
 name = "mkdocs-literate-nav"
-version = "0.4.1"
+version = "0.5.0"
 description = "MkDocs plugin to specify the navigation in Markdown instead of YAML"
 category = "dev"
 optional = false
@@ -1139,7 +1139,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10, <=3.11"
-content-hash = "a2c786008c41fa37062c9fffeaefc65353d7405d084035eb5ccbc3e9a80ef275"
+content-hash = "fae716c44172ba7ed62ba835dcfac4bd9f460a5490c1a9f77fea16ff51eeff59"
 
 [metadata.files]
 attrs = [
@@ -1557,16 +1557,16 @@ mkdocs-exclude = [
     {file = "mkdocs-exclude-1.0.2.tar.gz", hash = "sha256:ba6fab3c80ddbe3fd31d3e579861fd3124513708271180a5f81846da8c7e2a51"},
 ]
 mkdocs-gen-files = [
-    {file = "mkdocs-gen-files-0.3.5.tar.gz", hash = "sha256:d90d9e1676531a0bb96b1287dc28aa41162986de4dc3c00400214724761ff6ef"},
-    {file = "mkdocs_gen_files-0.3.5-py3-none-any.whl", hash = "sha256:69562fddc662482e8f54a00a8b4ede5166ad5384ae4dbb0469f1f338ef3285ca"},
+    {file = "mkdocs-gen-files-0.4.0.tar.gz", hash = "sha256:377bff8ee8e93515916689f483d971643f83a94eed7e92318854da8f344f0163"},
+    {file = "mkdocs_gen_files-0.4.0-py3-none-any.whl", hash = "sha256:3241a4c947ecd11763ca77cc645015305bf71a0e1b9b886801c114fcf9971e71"},
 ]
 mkdocs-include-markdown-plugin = [
     {file = "mkdocs_include_markdown_plugin-3.9.1-py3-none-any.whl", hash = "sha256:f33687e29ac66d045ba181ea50f054646b0090b42b0a4318f08e7f1d1235e6f6"},
     {file = "mkdocs_include_markdown_plugin-3.9.1.tar.gz", hash = "sha256:5e5698e78d7fea111be9873a456089daa333497988405acaac8eba2924a19152"},
 ]
 mkdocs-literate-nav = [
-    {file = "mkdocs-literate-nav-0.4.1.tar.gz", hash = "sha256:9efe26b662f2f901cae5807bfd51446d30ea7e033c2bc43a15d6282c7dfac1ab"},
-    {file = "mkdocs_literate_nav-0.4.1-py3-none-any.whl", hash = "sha256:a4b761792ba21defbe2dfd5e0de6ba451639e1ca0f0661c37eda83cc6261e4f9"},
+    {file = "mkdocs-literate-nav-0.5.0.tar.gz", hash = "sha256:c63d4385bb2b520baede25badad2d0936acebff3da175922c600d0a91902d8ff"},
+    {file = "mkdocs_literate_nav-0.5.0-py3-none-any.whl", hash = "sha256:b41149172af38c1a1df5e8d63292cbe7ed2a1431cd5daf884289036f2a9c7cca"},
 ]
 mkdocs-material = [
     {file = "mkdocs_material-8.5.10-py3-none-any.whl", hash = "sha256:51760fa4c9ee3ca0b3a661ec9f9817ec312961bb84ff19e5b523fdc5256e1d6c"},
