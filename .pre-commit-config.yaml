@@ -27,5 +27,3 @@ repos:
     hooks:
       - id: poetry-check
         files: ^pyproject.toml$
-      - id: poetry-lock
-        files: ^pyproject.toml$
