@@ -5,6 +5,7 @@ import zeep
 from lxml import etree
 from requests.models import Response
 from zeep.client import Client
+from zeep.transports import Transport
 
 from .model import (
     Account,
@@ -26,6 +27,7 @@ from typing import Any, Dict, List
 logger = logging.getLogger(__name__)
 
 DREBEDENGI_DEFAULT_SOAP_URL = "https://www.drebedengi.ru/soap/dd.wsdl"
+DREBEDENGI_DEFAULT_TIMEOUTS = (60, 300)
 
 
 class DrebedengiAPIError(Exception):
@@ -70,6 +72,8 @@ class DrebedengiAPI:
         *,
         strict: bool = True,
         soap_url: str = DREBEDENGI_DEFAULT_SOAP_URL,
+        wsdl_timeout: float = DREBEDENGI_DEFAULT_TIMEOUTS[0],
+        operation_timeout: float = DREBEDENGI_DEFAULT_TIMEOUTS[1],
     ) -> None:
         """API Wrapper class
 
@@ -79,13 +83,16 @@ class DrebedengiAPI:
             password (str): your password
             strict (bool, optional): strict mode - API calls will fail if the returned data doesn't match the model. Defaults to True.
             soap_url (str, optional): Optional alternative SOAP URL. Defaults to DREBEDENGI_DEFAULT_SOAP_URL.
+            wsdl_timeout (float, optional): WSDL download timeout. Defaults to 60s.
+            operation_timeout (float, optional): Operation timeout. Defaults to 300s.
         """
         self.api_key = api_key
         self.login = login
         self.password = password
         self.soap_url = soap_url
         self.strict = strict
-        self.client = Client(soap_url)  # type: ignore
+        transport = Transport(timeout=wsdl_timeout, operation_timeout=operation_timeout)
+        self.client = Client(soap_url, transport=transport)  # type: ignore
 
         logger.debug(
             f"Initialized DrebedengiAPI for {login=}. SOAP URL: {self.soap_url}. Strict: {self.strict}"
