@@ -9,6 +9,7 @@ from drebedengi.model import ChangeRecord, Transaction, TransactionType
 
 import pytest
 from attrs import evolve
+from requests.exceptions import ConnectTimeout, ReadTimeout
 
 from typing import Callable, List, Tuple
 
@@ -44,6 +45,34 @@ def test_api(credentials: Tuple[str, str, str]) -> DrebedengiAPI:
         login=login,
         password=password,
     )
+
+
+def test_wsdl_timeout(credentials: Tuple[str, str, str]) -> None:
+    """Test wsdl timeout on API."""
+    api_key, login, password = credentials
+
+    with pytest.raises((ConnectTimeout, ReadTimeout)):
+        DrebedengiAPI(
+            api_key=api_key,
+            login=login,
+            password=password,
+            wsdl_timeout=0.0001,
+        )
+
+
+def test_operation_timeout(credentials: Tuple[str, str, str]) -> None:
+    """Test operation timeout."""
+    api_key, login, password = credentials
+
+    test_api = DrebedengiAPI(
+        api_key=api_key,
+        login=login,
+        password=password,
+        operation_timeout=0.0001,
+    )
+
+    with pytest.raises((ConnectTimeout, ReadTimeout)):
+        test_api.get_transactions()
 
 
 @pytest.fixture(scope="module")

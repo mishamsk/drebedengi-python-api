@@ -26,7 +26,7 @@ jobs:
           path: ./CHANGELOG.md
 
       - name: Install poetry
-        run: pipx install poetry
+        run: pipx install poetry==1.2.1
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
@@ -41,7 +41,7 @@ jobs:
           poetry build
 
       - name: publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN}}

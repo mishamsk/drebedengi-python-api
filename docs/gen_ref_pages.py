@@ -4,13 +4,13 @@ from pathlib import Path
 
 import mkdocs_gen_files
 
-SOURCE_PATH = "drebedengi"
+SOURCE_PATH = "src/drebedengi"
 
 nav = mkdocs_gen_files.Nav()
 
 for path in sorted(Path(SOURCE_PATH).rglob("*.py")):
-    module_path = path.relative_to(".").with_suffix("")
-    doc_path = path.relative_to(".").with_suffix(".md")
+    module_path = path.relative_to("src").with_suffix("")
+    doc_path = path.relative_to("src").with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
 
     parts = tuple(module_path.parts)
