@@ -290,7 +290,8 @@ class Currency:
     Attributes:
         id (int): id is a unique drebedengi internal identifier for the currency.
         user_name (str): A custom currency name assigned by the user.
-        currency_code (str): International 3-leet currency code.
+        currency_code (str | None): International 3-letter currency code. May be absent for
+            user-defined currencies that don't carry an ISO-4217 code.
         exchange_rate (float): Current exchange rate from the default currency to the currency.
         budget_family_id (int): User family ID (for multiuser mode)
         is_default (bool): True if the currency is set as default.
@@ -300,7 +301,12 @@ class Currency:
 
     id: int = field(converter=int)
     user_name: str = field(converter=str, metadata={"xml": {"name": "name"}})
-    currency_code: str = field(converter=str, metadata={"xml": {"name": "code"}})
+    currency_code: str | None = field(
+        default=None,
+        kw_only=True,
+        converter=optional(str),
+        metadata={"xml": {"name": "code"}},
+    )
     exchange_rate: float = field(converter=float, metadata={"xml": {"name": "course"}})
     budget_family_id: int = field(converter=int, metadata={"xml": {"name": "family_id"}})
     is_default: bool = field(converter=to_bool)

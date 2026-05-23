@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from attrs import fields_dict, has
+from attrs import NOTHING, fields_dict, has
 from lxml import etree
 from zeep import xsd
 from zeep.helpers import guess_xsd_type
@@ -45,6 +45,9 @@ def xmlmap_to_model(xmlmap: etree.Element, model_type: Type[T], *, strict: bool 
         value = _get_xmlmap_value_by_key(xmlmap, key=key)
         if value:
             vals[name] = value[0]
+        elif field.default is not NOTHING:
+            # Field has an explicit default — leave it to attrs (do not error out, even in strict mode).
+            continue
         elif strict and not (field.type and isinstance(None, field.type)):
             raise ValueError(
                 f"Key <{name}> was not found in the element {etree.tostring(xmlmap, pretty_print=True)}"
