@@ -20,7 +20,7 @@ from .model import (
     Transaction,
     TransactionType,
 )
-from .utils import generate_xml_array, xmlmap_to_model
+from .utils import generate_xml_array, generate_xml_map_array, xmlmap_to_dict, xmlmap_to_model
 
 from typing import Any, Dict, List
 
@@ -202,6 +202,77 @@ class DrebedengiAPI:
         items: List[etree.Element] = root.findall(".//getRecordListReturn/item/value")
 
         return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
+
+    def set_record_list(self, records: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+        """
+        Implements setRecordList API — insert or update transactions in bulk.
+
+        Each record is a dict with one of the ID keys (which decides the action):
+
+            - ``server_id`` (int): existing record ID — *update* this record on the server
+            - ``client_id`` (int): an arbitrary local ID — *insert* a new record;
+              the server's reply will map this client_id back to the assigned server_id
+
+        Other fields:
+
+            - ``place_id`` (int): account ID (the "where the money was" account)
+            - ``budget_object_id`` (int): category ID for waste, source ID for incomes,
+              or destination place_id for transfers / currency changes
+            - ``sum`` (int): absolute value in hundredths (kopecks)
+            - ``operation_date`` (str): ``"YYYY-MM-DD HH:MM:SS"``
+            - ``comment`` (str): UTF-8 text, up to 2048 chars
+            - ``currency_id`` (int)
+            - ``operation_type`` (:class:`TransactionType` or int):
+              ``INCOME=2, EXPENSE=3, TRANSFER=4, EXCHANGE=5``
+            - ``is_duty`` (bool, default ``False``)
+            - ``server_move_id`` / ``client_move_id`` (int): for the *second* part of a transfer
+            - ``server_change_id`` / ``client_change_id`` (int): for the *second* part of a
+              currency exchange
+
+        Returns the array of ``{server_id, client_id}`` maps that the server sent back.
+        For inserts, ``client_id`` echoes what you passed in; for updates, ``server_id`` echoes
+        what you passed in. Save these mappings to translate local IDs into authoritative ones.
+
+        Original WSDL description:
+            Insert or update record list; [list] => array (indexes must be 0,1,2...N) of arrays;
+            see WSDL for the full field list. Returns the array of server IDs successfully
+            changed; the client MUST save server IDs corresponded to client IDs for subsequent
+            'update' and 'delete' calls.
+        """
+        if not records:
+            return []
+
+        # Normalize: enums → ints, TransactionType.value, etc.
+        normalized: List[Dict[str, Any]] = []
+        for raw in records:
+            r = dict(raw)
+            op_type = r.get("operation_type")
+            if isinstance(op_type, TransactionType):
+                r["operation_type"] = int(op_type)
+            normalized.append(r)
+
+        # SOAP wants a SOAP-encoded array of ns2:Map's, one Map per record. Use the
+        # map-aware helper — generate_xml_array would double-wrap the maps and the server
+        # would then receive Python repr strings.
+        list_xml = generate_xml_map_array(
+            [zeep.helpers.create_xml_soap_map(r) for r in normalized]  # type: ignore
+        )
+
+        with self.client.settings(raw_response=True, strict=False):
+            result = self.client.service.setRecordList(
+                self.api_key,
+                self.login,
+                self.password,
+                list=list_xml,
+            )
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        # setRecordListReturn is a SOAP-encoded Array of Maps, where each Map directly contains
+        # the server_id / client_id / status key-value pairs (unlike getRecordListReturn whose
+        # items are key=id + value=Map).
+        items: List[etree.Element] = root.findall(".//setRecordListReturn/item")
+        return [xmlmap_to_dict(item) for item in items]
 
     def get_changes(self, *, revision: int) -> List[ChangeRecord]:
         """

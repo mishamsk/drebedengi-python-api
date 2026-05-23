@@ -58,6 +58,21 @@ def xmlmap_to_model(xmlmap: etree.Element, model_type: Type[T], *, strict: bool 
     return ret
 
 
+def xmlmap_to_dict(xmlmap: etree.Element) -> dict[str, str]:
+    """Converts an XML ns2:Map element to a flat ``{key: value}`` dict.
+
+    Unlike :func:`xmlmap_to_model`, this does not coerce values into a typed model — it just
+    returns raw strings keyed by the XML ``<key>`` elements. Useful for write-method responses
+    where the server returns ad-hoc maps such as ``{server_id: ..., client_id: ...}``.
+    """
+    out: dict[str, str] = {}
+    for item in xmlmap.findall("item"):
+        key = item.findtext("key") or ""
+        value = item.findtext("value") or ""
+        out[key] = value
+    return out
+
+
 def generate_xml_array(values: List[Any]) -> xsd.ComplexType:
     """Generates a SOAP Array from a list of values.
 
@@ -73,6 +88,21 @@ def generate_xml_array(values: List[Any]) -> xsd.ComplexType:
     )
 
     return Array(item=[xsd.AnyObject(guess_xsd_type(value), value) for value in values])  # type: ignore
+
+
+def generate_xml_map_array(maps: List[Any]) -> xsd.ComplexType:
+    """Generates a SOAP Array whose elements are already typed values (typically pre-built
+    ns2:Map's from :func:`zeep.helpers.create_xml_soap_map`).
+
+    Unlike :func:`generate_xml_array`, this does NOT wrap items into ``xsd.AnyObject`` — that
+    extra wrapping double-encodes Maps and the server then receives them as Python repr
+    strings instead of well-formed XML maps.
+    """
+    Array = xsd.ComplexType(
+        xsd.Sequence([xsd.Element("item", xsd.AnyType(), min_occurs=1, max_occurs="unbounded")]),  # type: ignore
+        qname=etree.QName("{http://schemas.xmlsoap.org/soap/encoding/}Array"),
+    )
+    return Array(item=maps)  # type: ignore
 
 
 def check_same_transfer_transactions(tr1: Transaction, tr2: Transaction) -> bool:
