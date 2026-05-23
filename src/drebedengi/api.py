@@ -22,7 +22,11 @@ from .model import (
 )
 from .utils import generate_xml_array, xmlmap_to_model
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
+
+DeletableObjectType = Literal[
+    "waste", "income", "move", "change", "object", "currency", "tag", "accum"
+]
 
 logger = logging.getLogger(__name__)
 
@@ -202,6 +206,48 @@ class DrebedengiAPI:
         items: List[etree.Element] = root.findall(".//getRecordListReturn/item/value")
 
         return [xmlmap_to_model(item, Transaction, strict=self.strict) for item in items]
+
+    def delete_object(self, *, object_id: int, object_type: DeletableObjectType) -> bool:
+        """
+        Implements deleteObject API — delete a single object on the server.
+
+        Args:
+            object_id: ID of the object to delete.
+            object_type: one of ``"waste"``, ``"income"``, ``"move"``, ``"change"``,
+                ``"object"``, ``"currency"``, ``"tag"``, ``"accum"``.
+                ``"object"`` covers waste categories, income sources and accounts (places).
+                For ``"move"`` and ``"change"`` records, the second part of the pair is
+                deleted automatically by the server.
+
+        Returns:
+            ``True`` on success.
+
+        Raises:
+            DrebedengiAPIError: on any server-side error, including the "other object connected
+                to this ID — delete them first" case (you'll need to delete dependants in the
+                right order).
+
+        Original WSDL description:
+            Delete any object; [id] => ID of the object to delete; [type] => The type of the
+            object, must be one of: 'waste' 'income' 'move' 'change' 'object' 'currency' 'tag'
+            'accum'; 'object' is waste category, income source or place; If 'id' identifies
+            'move' or 'change', both records will be deleted on the server; Returns 1 on
+            success; if an error accures - generates SoapFault message; if there is other
+            object connected to this ID - delete them first;
+        """
+        with self.client.settings(raw_response=True, strict=False):
+            result = self.client.service.deleteObject(
+                self.api_key,
+                self.login,
+                self.password,
+                id=object_id,
+                type=object_type,
+            )
+            DrebedengiAPIError.check_and_raise(result)
+
+        root = etree.fromstring(result.content)
+        ret = root.findtext(".//deleteObjectReturn")
+        return ret == "1"
 
     def get_changes(self, *, revision: int) -> List[ChangeRecord]:
         """
