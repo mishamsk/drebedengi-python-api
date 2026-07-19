@@ -29,13 +29,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v7
-      - name: Install poetry
-        run: pipx install poetry
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-versions }}
-          cache: "poetry"
+
+      - name: Install poetry
+        run: pipx install poetry
 
       - name: Install dependencies
         run: |
@@ -71,14 +72,13 @@ jobs:
           version: ${{ steps.tag_name.outputs.current_version }}
           path: ./CHANGELOG.md
 
-      - name: Install poetry
-        run: pipx install poetry==1.2.1
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-versions }}
-          cache: "poetry"
+
+      - name: Install poetry
+        run: pipx install poetry==1.2.1
 
       - name: Install dependencies
         run: |
