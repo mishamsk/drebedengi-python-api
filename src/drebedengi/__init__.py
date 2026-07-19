@@ -1,7 +1,8 @@
 """Top-level package for Drebedengi Python API."""
+
 __author__ = """Mike Perlov"""
 __email__ = "mishamsk@gmail.com"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from .api import DrebedengiAPI
 

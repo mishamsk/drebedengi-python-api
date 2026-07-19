@@ -3,6 +3,7 @@
 
 import os
 from pathlib import Path
+from unittest.mock import MagicMock
 
 from drebedengi import DrebedengiAPI
 from drebedengi.model import ChangeRecord, Transaction, TransactionType
@@ -204,6 +205,46 @@ def test_get_accounts(test_api: DrebedengiAPI) -> None:
     accounts = test_api.get_accounts()
 
     assert len(accounts) > 0
+
+
+def test_get_accounts_ignores_folders() -> None:
+    """Folder places are not returned as accounts."""
+    response = MagicMock(
+        ok=True,
+        content=b"""
+            <Envelope>
+                <getPlaceListReturn>
+                    <item>
+                        <item><key>id</key><value>10</value></item>
+                        <item><key>type</key><value>9</value></item>
+                    </item>
+                    <item>
+                        <item><key>id</key><value>20</value></item>
+                        <item><key>budget_family_id</key><value>30</value></item>
+                        <item><key>type</key><value>4</value></item>
+                        <item><key>name</key><value>Account</value></item>
+                        <item><key>is_hidden</key><value>f</value></item>
+                        <item><key>is_autohide</key><value>f</value></item>
+                        <item><key>is_for_duty</key><value>f</value></item>
+                        <item><key>sort</key><value>1</value></item>
+                    </item>
+                </getPlaceListReturn>
+            </Envelope>
+        """,
+    )
+    client = MagicMock()
+    client.settings.return_value.__enter__.return_value = None
+    client.service.getPlaceList.return_value = response
+    api = DrebedengiAPI.__new__(DrebedengiAPI)
+    api.api_key = "api_key"
+    api.login = "login"
+    api.password = "password"
+    api.strict = True
+    api.client = client
+
+    accounts = api.get_accounts()
+
+    assert [account.id for account in accounts] == [20]
 
 
 def test_get_accounts_by_id(

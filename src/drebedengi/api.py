@@ -13,6 +13,7 @@ from .model import (
     Currency,
     ExpenseCategory,
     IncomeSource,
+    ObjectType,
     ReportFilterType,
     ReportGrouping,
     ReportPeriod,
@@ -404,6 +405,13 @@ class DrebedengiAPI:
 
         root = etree.fromstring(result.content)
         items: List[etree.Element] = root.findall(".//getPlaceListReturn/item")
+        # getPlaceList also returns type-9 folder records, which are not accounts.
+        items = [
+            item
+            for item in items
+            if item.xpath("item/key[text() = 'type']/../value/text()")
+            == [str(ObjectType.ACCOUNT.value)]
+        ]
 
         return [xmlmap_to_model(item, Account, strict=self.strict) for item in items]
 

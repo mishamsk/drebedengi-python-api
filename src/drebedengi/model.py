@@ -1,4 +1,4 @@
-""" Drebedengi data model & API dictionaries module """
+"""Drebedengi data model & API dictionaries module"""
 
 from datetime import datetime
 from enum import IntEnum

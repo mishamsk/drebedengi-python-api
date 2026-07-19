@@ -30,7 +30,7 @@ for path in sorted(Path(SOURCE_PATH).rglob("*.py")):
         fd.write(f"::: {ident}")
         if doc_path.name == "index.md":
             indent = "  "
-            fd.write(f"\n{indent*2}options:\n{indent*3}members: false")
+            fd.write(f"\n{indent * 2}options:\n{indent * 3}members: false")
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path)
 
