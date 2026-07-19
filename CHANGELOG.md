@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2026-07-19
 
+### Added
+* Add support for Python 3.12, 3.13, and 3.14
+
+### Changed
+* Migrate project packaging and dependency management from Poetry to uv
+* Replace Black, isort, flake8, and tox with Ruff and direct uv commands
+
 ### Fixed
 * Ignore folder objects returned by `getPlaceList` when retrieving accounts
 

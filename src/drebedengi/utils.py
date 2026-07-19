@@ -1,4 +1,4 @@
-""" Supporting utilities for working with XML & SOAP """
+"""Supporting utilities for working with XML & SOAP"""
 
 from __future__ import annotations
 

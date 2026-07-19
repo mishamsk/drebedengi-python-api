@@ -55,11 +55,12 @@ Ready to contribute? Here's how to set up `drebedengi-python-api` for local deve
     $ git clone git@github.com:your_name_here/drebedengi-python-api.git
     ```
 
-3. Ensure [poetry](https://python-poetry.org/docs/) is installed.
-4. Install dependencies and start your virtualenv:
+3. Ensure [uv](https://docs.astral.sh/uv/getting-started/installation/) is installed.
+4. Install the supported Python versions and project dependencies:
 
     ```
-    $ poetry install
+    $ uv python install 3.10 3.11 3.12 3.13 3.14
+    $ uv sync --all-groups
     ```
 
 5. Create a branch for local development:
@@ -70,11 +71,10 @@ Ready to contribute? Here's how to set up `drebedengi-python-api` for local deve
 
     Now you can make your changes locally.
 
-6. When you're done making changes, check that your changes pass the
-   tests, including testing other Python versions, with tox:
+6. When you're done making changes, format, lint, type-check, and test them:
 
     ```
-    $ poetry run tox
+    $ make test
     ```
 
 7. Commit your changes and push your branch to GitHub:
@@ -95,14 +95,14 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.md.
-3. The pull request should work for Python 3.10. Check
+3. The pull request should work for every supported Python version. Check
    https://github.com/mishamsk/drebedengi-python-api/actions
    and make sure that the tests pass for all supported Python versions.
 
 ## Tips
 
 ```
-$ poetry run pytest tests/test_drebedengi.py
+$ uv run pytest tests/test_drebedengi.py
 ```
 
 To run a subset of tests.
@@ -115,7 +115,7 @@ Make sure all your changes are committed (including an entry in CHANGELOG.md).
 Then run:
 
 ```
-$ poetry run bump2version patch # possible: major / minor / patch
+$ uv run bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 ```
