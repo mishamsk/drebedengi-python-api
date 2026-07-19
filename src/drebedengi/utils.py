@@ -7,7 +7,7 @@ from lxml import etree
 from zeep import xsd
 from zeep.helpers import guess_xsd_type
 
-from typing import TYPE_CHECKING, Any, List, Type, TypeVar
+from typing import TYPE_CHECKING, Any, List, Type, TypeVar, cast
 
 if TYPE_CHECKING:
     from .model import Transaction
@@ -55,7 +55,7 @@ def xmlmap_to_model(xmlmap: etree.Element, model_type: Type[T], *, strict: bool 
     except ValueError:
         raise ValueError(f"Could not convert values from {etree.dump(xmlmap)} to {model_type}")
 
-    return ret
+    return cast(T, ret)
 
 
 def generate_xml_array(values: List[Any]) -> xsd.ComplexType:
