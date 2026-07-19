@@ -2,7 +2,7 @@
 
 __author__ = """Mike Perlov"""
 __email__ = "mishamsk@gmail.com"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 from .api import DrebedengiAPI
 
