@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **I’ve moved on to [Mina](https://github.com/mishamsk/mina).**
+>
+> Drebedengi was—and probably still is—a great service. These days, I use and actively develop Mina, a modern self-hosted personal finance system.
+
 # Drebedengi Python API
 
 [![pypi](https://img.shields.io/pypi/v/drebedengi-python-api.svg)](https://pypi.org/project/drebedengi-python-api/)
